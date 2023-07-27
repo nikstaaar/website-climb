@@ -1,7 +1,7 @@
 import React from 'react'
 import * as THREE from 'three'
 import { Canvas} from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Stats } from '@react-three/drei'
 import { RigidBody, Physics } from '@react-three/rapier'
 
 
@@ -24,6 +24,7 @@ function App() {
         <mesh position={[0, -28, 0]} geometry={groundGeometry} rotation={[-Math.PI / 2, 0, 0]} scale={100} />
     </RigidBody>
   </Physics>
+  <Stats />
 </Canvas>
 </div>
 }

@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useGLTF, RenderTexture } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
-
-import Content from "./Content"
+import { useThree, useFrame } from '@react-three/fiber';
+import * as THREE from 'three'
 
 function compareNames(a, b) {
   const nameA = a.name.toUpperCase(); 
@@ -18,7 +18,27 @@ function compareNames(a, b) {
 }
 
 
+
 export default function Screen() {
+
+  const { gl, scene, camera, size } = useThree();
+  const renderTarget = useRef(new THREE.WebGLRenderTarget(size.width, size.height));
+  const scene2 = new THREE.Scene()
+  scene2.background = new THREE.Color(0xD61C4E)
+  const camera2 = new THREE.PerspectiveCamera()
+
+
+  useFrame(() => {
+    // Update your scene and camera here if needed
+
+    // Render the scene to the render target
+    gl.setRenderTarget(renderTarget.current);
+    gl.render(scene2, camera2);
+    gl.setRenderTarget(null);
+  });
+
+  // Return a material with the render target's texture
+    const texture = renderTarget.current.texture;
 
     const screenModel = useGLTF('../../screen4.glb')
     const screenMeshes = screenModel.scenes[0].children
@@ -36,17 +56,13 @@ export default function Screen() {
             <meshBasicMaterial color="blue"/>
           </mesh>
           <mesh geometry={facePlanes[index].geometry} scale={facePlanes[index].scale} position={[0, 1.01, 0]} rotation-y={Math.PI}>
-            <meshBasicMaterial>
-              <RenderTexture attach="map" anisotropy={0}>
-                <Content />
-              </RenderTexture>
-            </meshBasicMaterial>
+          <meshBasicMaterial map={texture}/>
           </mesh>
         </RigidBody>
       )
     })
   
     
-    
-    return <>{screen}</>
+    return <>
+    {screen}</>
   }
