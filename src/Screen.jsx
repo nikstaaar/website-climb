@@ -21,13 +21,14 @@ function compareNames(a, b) {
 export default function Screen() {
 
     const screenModel = useGLTF('../../screen4.glb')
+    const screenMeshes = screenModel.scenes[0].children
 
-    screenModel.scenes[0].children.sort(compareNames)
+    screenMeshes.sort(compareNames)
     
-    const facePlanes = screenModel.scenes[0].children.slice(58, 116)
-    const screenBlocks = screenModel.scenes[0].children.slice(0, 58)
+    const facePlanes = screenMeshes.slice(screenMeshes.length/2, screenMeshes.length)
+    const screenBlocks = screenMeshes.slice(0, screenMeshes.length/2)
   
-    console.log(facePlanes, screenBlocks)
+
     const screen = screenBlocks.map((block, index) => {
       return (
         <RigidBody type="dynamic" colliders="hull" key={index} restitution={0.1} friction={0.5}>
