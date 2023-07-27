@@ -4,20 +4,37 @@ import { RigidBody } from "@react-three/rapier"
 
 import Content from "./Content"
 
+function compareNames(a, b) {
+  const nameA = a.name.toUpperCase(); 
+  const nameB = b.name.toUpperCase();
+
+  if (nameA < nameB) {
+    return -1; 
+  }
+  if (nameA > nameB) {
+    return 1; 
+  }
+  return 0; 
+}
+
 
 export default function Screen() {
 
-    const screen = useGLTF('../../screen2.glb')
-    const face = useGLTF('../../face2.glb')
+    const screenModel = useGLTF('../../screen4.glb')
+
+    screenModel.scenes[0].children.sort(compareNames)
+    
+    const facePlanes = screenModel.scenes[0].children.slice(58, 116)
+    const screenBlocks = screenModel.scenes[0].children.slice(0, 58)
   
-    const faceBlocks = face.scenes[0].children 
-    const screenBlocks = screen.scenes[0].children.map((block, index) => {
+    console.log(facePlanes, screenBlocks)
+    const screen = screenBlocks.map((block, index) => {
       return (
-        <RigidBody colliders="hull" key={index} restitution={0.1} friction={0.5}>
+        <RigidBody type="dynamic" colliders="hull" key={index} restitution={0.1} friction={0.5}>
           <mesh geometry={block.geometry} scale={block.scale} rotation-x={Math.PI * 0.5} rotation-y={Math.PI * 0.5}>
             <meshBasicMaterial color="blue"/>
           </mesh>
-          <mesh geometry={faceBlocks[index].geometry} scale={faceBlocks[index].scale} position={[0, 1.01, 0]} rotation-y={Math.PI}>
+          <mesh geometry={facePlanes[index].geometry} scale={facePlanes[index].scale} position={[0, 1.01, 0]} rotation-y={Math.PI}>
             <meshBasicMaterial>
               <RenderTexture attach="map" anisotropy={0}>
                 <Content />
@@ -29,5 +46,6 @@ export default function Screen() {
     })
   
     
-    return <>{screenBlocks}</>
+    
+    return <>{screen}</>
   }

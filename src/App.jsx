@@ -14,8 +14,9 @@ function App() {
 
   const groundGeometry = new THREE.PlaneGeometry()
 
-  return <Canvas>
-  <Physics>
+  return <div style={{ width: "70vw", height: "70vh" }}>
+  <Canvas >
+  <Physics debug>
     <OrbitControls />
     <ambientLight intensity={0.5} />
     <Screen />
@@ -24,6 +25,7 @@ function App() {
     </RigidBody>
   </Physics>
 </Canvas>
+</div>
 }
 
    
