@@ -14,7 +14,7 @@ function App() {
 
   const groundGeometry = new THREE.PlaneGeometry()
 
-  return <div style={{ width: "70vw", height: "70vh" }}>
+  return <div style={{ width: "100vw", height: "100vh" }}>
   <Canvas >
   <Physics debug>
     <OrbitControls />
