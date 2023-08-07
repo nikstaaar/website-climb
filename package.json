@@ -18,7 +18,8 @@
     "react-dom": "^18.2.0",
     "stats.js": "^0.17.0",
     "three": "^0.153.0",
-    "troika-three-text": "^0.48.0-unicode.3"
+    "troika-three-text": "^0.48.0-unicode.3",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.37",
