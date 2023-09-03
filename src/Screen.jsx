@@ -8,6 +8,7 @@ import * as THREE from 'three'
 import useStore from './stores/useStore'
 
 
+
 function compareNames(a, b) {
   const nameA = a.name.toUpperCase()
   const nameB = b.name.toUpperCase()
