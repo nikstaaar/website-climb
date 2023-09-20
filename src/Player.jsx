@@ -3,12 +3,9 @@ import { useFrame } from "@react-three/fiber"
 import { RigidBody, useRapier, CuboidCollider, vec3 } from "@react-three/rapier"
 import { useRef, useEffect } from "react"
 import * as THREE from 'three'
-
 import useStore from './stores/useStore'
 
 export default function Player () {
-    
-
     const gameOn = useStore((state) => {return state.gameOn})
     const hasCollided = useStore((state) => {return state.hasCollided})
     const collide = useStore((state) => {return state.collide})
@@ -26,25 +23,6 @@ export default function Player () {
         velocity: vec3()
       })
 
-    const handleWheel = (event) => {
-        if (!body.current) return
-        if (gameOn) return
-      
-        const zoomAmount = event.deltaY * 0.01
-        const minZ = -7.15
-        const maxZ = 6.85
-        const bodyPosition = body.current.translation()
-        const desiredZ = bodyPosition.z + zoomAmount
-        body.current.setTranslation({x:bodyPosition.x, y:bodyPosition.y, z:Math.max(minZ, Math.min(maxZ, desiredZ))})
-      }
-
-    useEffect(() => {
-        window.addEventListener('wheel', handleWheel)
-        return () => {
-            window.removeEventListener('wheel', handleWheel)
-        }
-    }, [gameOn])
-
     useEffect(() => {
         if(gameOn && body.current){
             body.current.setBodyType(0)
@@ -53,7 +31,6 @@ export default function Player () {
         }
     }, [gameOn])
 
-    
     useEffect(() => {
         const characterController = rapier.world.createCharacterController(0.5)
         characterController.setApplyImpulsesToDynamicBodies(true)
@@ -126,8 +103,6 @@ export default function Player () {
       
       const targetRotation = new THREE.Quaternion(0, 0, 0, 1)
       const angleDifference = bodyQuaternion.angleTo(targetRotation)
-      
-      
 
       if (angleDifference > 0.05) {
         const newRotation = bodyQuaternion.clone()
@@ -153,7 +128,7 @@ export default function Player () {
     colliders={false}
     ref={body}  
     rotation={[-Math.PI / 2, 0, 0]}
-    position={[0, 20, -7.15]}
+    position={[0, 20, 0]}
     onCollisionEnter={(target)=>{
         if(target.rigidBodyObject.name === "floor"){
             setTimeout(() => {

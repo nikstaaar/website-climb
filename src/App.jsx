@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Canvas} from '@react-three/fiber'
 import { Stats, Sky, KeyboardControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
-
 import World from './World.jsx'
 import Interface from './Interface.jsx'
 import Player from './Player.jsx'
@@ -12,7 +11,28 @@ import './App.css'
 
 function App() {
 
-  return <div style={{ width: "100vw", height: "100vh" }}>
+    const [dimensions, setDimensions] = useState({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  
+    useEffect(() => {
+      const handleResize = () => {
+        setDimensions({
+          width: window.innerWidth,
+          height: window.innerHeight
+        });
+      };
+  
+      window.addEventListener('resize', handleResize);
+  
+      // Cleanup the event listener on component unmount
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []); 
+
+  return <div style={ dimensions }>
   <KeyboardControls 
     map={ [
       {name: 'forward', keys: ['ArrowUp', 'KeyW']},

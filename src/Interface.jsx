@@ -14,7 +14,6 @@ useEffect(() => {
       if (hasStoodUp){
         setHasClicked(true)
       }  
-      
     }
   
     window.addEventListener('click', handleClick);

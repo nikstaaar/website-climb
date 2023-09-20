@@ -1,13 +1,10 @@
-import React, { useRef } from 'react'
-import { useGLTF, useFBO, PerspectiveCamera, Text3D, Text } from "@react-three/drei"
+import React from 'react'
+import { useGLTF, useFBO } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
-import { useFrame } from '@react-three/fiber'
+import { useThree } from '@react-three/fiber'
 import { RenderTexture } from './RenderTexture'
-import * as THREE from 'three'
-
+import Content from './Content'
 import useStore from './stores/useStore'
-
-
 
 function compareNames(a, b) {
   const nameA = a.name.toUpperCase()
@@ -22,65 +19,39 @@ function compareNames(a, b) {
   return 0; 
 }
 
-
-
-
 export default function Screen() {
-
     const gameOn = useStore((state) => {return state.gameOn})
-
-    const pyramidRef = useRef()
-  
-    const targetFBO = useFBO(2048 * window.devicePixelRatio, 2048 * window.devicePixelRatio)
-
-    const screenModel = useGLTF('../../screen4.glb')
+    
+    const { size, viewport } = useThree();
+    const targetFBO = useFBO((size.width * viewport.dpr), (size.height * viewport.dpr))
+    
+    const screenModel = useGLTF('../../screen7.glb')
     const screenMeshes = screenModel.scenes[0].children
     screenMeshes.sort(compareNames)
-    
     const facePlanes = screenMeshes.slice(screenMeshes.length/2, screenMeshes.length)
     const screenBlocks = screenMeshes.slice(0, screenMeshes.length/2)
-
-    useFrame(() => {
-      if (pyramidRef.current) {
-          pyramidRef.current.rotation.x += 0.01;
-          pyramidRef.current.rotation.y += 0.01;
-          pyramidRef.current.rotation.z += 0.01;
-      }
-    });
   
-
     const screen = screenBlocks.map((block, index) => {
       return (
         <>
-        <RigidBody key={gameOn} type={gameOn? "dynamic" : "fixed"} colliders="hull" key={index} restitution={0.1} friction={0.5}>
-          <mesh geometry={block.geometry} scale={block.scale} rotation-x={Math.PI * 0.5} rotation-y={Math.PI * 0.5}>
+        <RigidBody type={gameOn? "dynamic" : "fixed"} colliders="hull" key={index} restitution={0.1} friction={0.5}>
+          <group rotation={[0, 0, 0]}>
+          <mesh geometry={block.geometry} scale={block.scale}  rotation={[Math.PI * 0.5, Math.PI * 0.5 , 0]}>
             <meshBasicMaterial color="blue"/>
           </mesh>
           <mesh geometry={facePlanes[index].geometry} scale={facePlanes[index].scale} position={[0, 1.01, 0]} rotation-y={Math.PI}>
           <meshBasicMaterial map={targetFBO.texture}/>
           </mesh>
+          </ group>
         </RigidBody>
         </>
       )
     })
   
-    
     return <>
-     <RenderTexture size={[2048 * window.devicePixelRatio, 2048 * window.devicePixelRatio]} targetFBO={targetFBO}>
-          <PerspectiveCamera makeDefault manual aspect={16 / 12} resolution={1080} position={[0, 0, 2]}  />
-          <directionalLight args={[10, 10, 0]} intensity={1} />
-          <ambientLight intensity={1} />
-          <color attach="background" args={['darkred']} />
-          <group scale={[-1, 1, 1]}>
-              <Text scale={[1, 1, 1]} fontSize={0.1} >hellooooooooooooo</Text>
-              <mesh ref={pyramidRef} position={[0, -0.5, 0]} scale={0.15}>
-                <tetrahedronGeometry attach="geometry" args={[2, 0]} />
-                <meshStandardMaterial attach="material" color="green" />
-              </mesh>
-          </group>
+      <RenderTexture targetFBO={targetFBO}>
+        <Content />
       </RenderTexture>
     {screen}
-    
-    
     </>
   }
