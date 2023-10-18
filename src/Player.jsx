@@ -1,16 +1,16 @@
 import { Box, useKeyboardControls } from "@react-three/drei"
 import { useFrame } from "@react-three/fiber"
-import { RigidBody, useRapier, CuboidCollider, vec3 } from "@react-three/rapier"
+import { RigidBody, useRapier, CuboidCollider, vec3, quat } from "@react-three/rapier"
 import { useRef, useEffect } from "react"
+import { useControls } from "leva"
 import * as THREE from 'three'
 import useStore from './stores/useStore'
 
 export default function Player () {
-    const gameOn = useStore((state) => {return state.gameOn})
-    const hasCollided = useStore((state) => {return state.hasCollided})
-    const collide = useStore((state) => {return state.collide})
-    const hasStoodUp = useStore((state) => {return state.hasStoodUp})
-    const standUp = useStore((state) => {return state.standUp})
+
+    const level = useStore((state) => {return state.level})
+    const stage = useStore((state) => {return state.stage})
+    const setStage = useStore((state) => {return state.setStage})
 
     const rapier = useRapier()
     
@@ -23,19 +23,26 @@ export default function Player () {
         velocity: vec3()
       })
 
+    const controls = useControls({
+      jumpHeight: 0.27,
+    })
+  
     useEffect(() => {
-        if(gameOn && body.current){
-            body.current.setBodyType(0)
-            body.current.setEnabled(false)
-            body.current.setEnabled(true)
+        if(stage==="falling" && body.current){
+            setTimeout(() => {
+              body.current.setBodyType(0)
+              body.current.setEnabled(false)
+              body.current.setEnabled(true)
+            }, "7000") 
         }
-    }, [gameOn])
+    }, [stage])
 
     useEffect(() => {
         const characterController = rapier.world.createCharacterController(0.5)
         characterController.setApplyImpulsesToDynamicBodies(true)
         characterController.setCharacterMass(0.2)
         characterController.enableSnapToGround(0.02)
+        characterController.enableAutostep(0.02)
         controller.current = characterController
 
       }, [rapier])
@@ -43,16 +50,14 @@ export default function Player () {
     const [subscribeKeys, getKeys] = useKeyboardControls()
     
     useFrame((state, delta) => {
-
       const keys = getKeys()
-      
       const { velocity } = refState.current
       const movement = vec3()
       const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(state.camera.quaternion)
       const backward = forward.clone().negate()
       const strafeRight = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0))
       const strafeLeft = strafeRight.clone().negate();
-      let moveSpeed = 0.12
+      let moveSpeed = 0.15
 
       if (keys.forward) {
         movement.add(forward)
@@ -69,7 +74,7 @@ export default function Player () {
       }
 
       if (refState.current.grounded && keys.jump) {
-        velocity.y = 0.25 
+        velocity.y = controls.jumpHeight
       }
 
       if (!refState.current.grounded) {
@@ -77,37 +82,28 @@ export default function Player () {
       }   
       
       const bodyPosition = body.current.translation()
+      const position = vec3(bodyPosition)
       state.camera.position.copy(bodyPosition)
-      const bodyRotation = body.current.rotation()
-      const bodyQuaternion = new THREE.Quaternion(bodyRotation.x, bodyRotation.y, bodyRotation.z, bodyRotation.w)
+      const bodyQuaternion = quat(body.current.rotation())
       
-      if(!hasStoodUp){
+      if (body.current.isSleeping() && stage === "falling") {
+        setStage("floor")
+      }
+
+      if(stage !== "walking"){
         const bodyEuler = new THREE.Euler().setFromQuaternion(bodyQuaternion);
         state.camera.rotation.copy(bodyEuler)
       }
 
-      if(hasCollided){
-        body.current.setBodyType(2)
-
-        if(hasStoodUp){
-          movement.normalize()
-          movement.multiplyScalar(moveSpeed)
-          movement.add(velocity)
-          const position = vec3 (bodyPosition)
-          controller.current.computeColliderMovement(collider.current, movement)
-          refState.current.grounded = controller.current.computedGrounded()
-          let correctedMovement = controller.current.computedMovement()
-          position.add(vec3(correctedMovement))
-          body.current.setNextKinematicTranslation(position)
-       }
-      
+      if(stage === "floor" || stage === "walking" ){
+      body.current.setBodyType(2)
       const targetRotation = new THREE.Quaternion(0, 0, 0, 1)
       const angleDifference = bodyQuaternion.angleTo(targetRotation)
 
       if (angleDifference > 0.05) {
         const newRotation = bodyQuaternion.clone()
         function easeOutExpo(t) {
-          return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+          return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
         }
         let t = 0
         t += 0.004
@@ -115,32 +111,40 @@ export default function Player () {
         newRotation.slerp(targetRotation, step)
         body.current.setNextKinematicRotation(newRotation)
       } else {
-        standUp()
+        setStage("walking")
       }
-      }
-      }
-    )
+
+      if(level==="level_2" && position.y <= 30)
+          {
+            console.log("resetting")
+            position.copy(new THREE.Vector3(13.6, 65, -19))
+          }
+
+      if(stage === "walking"){
+        movement.normalize()
+        movement.multiplyScalar(moveSpeed)
+        movement.add(velocity)
+        controller.current.computeColliderMovement(collider.current, movement)
+        refState.current.grounded = controller.current.computedGrounded()
+        let correctedMovement = controller.current.computedMovement()
+        position.add(vec3(correctedMovement))
+        body.current.setNextKinematicTranslation(position)
+      }}}
+      )
    
     return(<>
     <RigidBody
     name="player"
     type={"fixed"}
     colliders={false}
-    ref={body}  
+    ref={body}
     rotation={[-Math.PI / 2, 0, 0]}
-    position={[0, 20, 0]}
-    onCollisionEnter={(target)=>{
-        if(target.rigidBodyObject.name === "floor"){
-            setTimeout(() => {
-                collide()
-              }, "5000")
-        }
-    }}
+    position={[0, 129.80, 0]}
     >
         <Box args={[1, 3, 1]}>
             <meshStandardMaterial transparent opacity={0} />
         </Box>
-        <CuboidCollider mass={500} restitution={0.1} args={[0.5, 1.5, 0.5]} ref={collider} />
+        <CuboidCollider mass={30} restitution={0.2} args={[0.5, 1.5, 0.5]} ref={collider} />
     </RigidBody>
     </>
     )

@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react'
 
 export default function Interface () {
 
-const hasStoodUp = useStore((state)=>{return state.hasStoodUp})
+const stage = useStore((state)=>{return state.stage})
 const controls = useKeyboardControls((state) => state)
 
 const [hasClicked, setHasClicked] = useState(false)
 
 useEffect(() => {
     const handleClick = () => {
-      if (hasStoodUp){
+      if (stage === "walking"){
         setHasClicked(true)
       }  
     }
@@ -21,10 +21,10 @@ useEffect(() => {
     return () => {
       window.removeEventListener('click', handleClick);
     }
-  }, [hasStoodUp])
+  }, [stage === "walking"])
 
     return <>
-    {hasStoodUp? 
+    {stage === "walking"? 
     <div className="interface">
         {!hasClicked? 
             <div className="instructions">Left Click to Look Around</div> 

@@ -3,24 +3,25 @@ import { create } from "zustand";
 export default create((set) =>
 {
     return {
-        gameMode: false,
-        hasCollided: false,
-        start: () =>
+        stage: "website",
+        level: "level_0",
+        cycle: 0,
+        setStage: (stage) =>
         {
             set(() => {
-                return { gameOn: true}
+                return { stage: stage}
             })
         },
-        collide: () =>
+        setLevel: (level) =>
         {
             set(() => {
-                return { hasCollided: true}
+                return { level: level}
             })
         },
-        standUp: () =>
+        addCycle: () =>
         {
             set(() => {
-                return { hasStoodUp: true}
+                return { cycle: cycle+1}
             })
         }
     }

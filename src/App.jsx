@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import { Canvas} from '@react-three/fiber'
-import { Stats, Sky, KeyboardControls } from '@react-three/drei'
+import { Stats, KeyboardControls} from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 import World from './World.jsx'
 import Interface from './Interface.jsx'
 import Player from './Player.jsx'
 import Screen from './Screen.jsx'
+import { useControls } from 'leva'
 
 import './App.css'
 
 function App() {
+    const debug = useControls({
+    debug: false,
+    })
 
     const [dimensions, setDimensions] = useState({
       width: window.innerWidth,
       height: window.innerHeight
-    });
-  
+    })
+ 
     useEffect(() => {
       const handleResize = () => {
         setDimensions({
@@ -26,7 +30,6 @@ function App() {
   
       window.addEventListener('resize', handleResize);
   
-      // Cleanup the event listener on component unmount
       return () => {
         window.removeEventListener('resize', handleResize);
       };
@@ -42,20 +45,17 @@ function App() {
       {name: 'jump', keys: ['Space']}
     ]}
     >
-    <Canvas pixelratio={Math.min(window.devicePixelRatio, 2)} >
-      <Physics >
+    <Canvas dpr={[1, 2]}>
+      <Physics debug={debug.debug}>
         <Screen />
         <World />
         <Player />
       </Physics>
-      <Sky />
       <Stats />
     </Canvas>
     <Interface />
   </KeyboardControls>
 </div>
 }
-
-   
 
 export default App
