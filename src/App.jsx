@@ -6,14 +6,14 @@ import World from './World.jsx'
 import Interface from './Interface.jsx'
 import Player from './Player.jsx'
 import Screen from './Screen.jsx'
-import { useControls } from 'leva'
+import Controls from './Controls.jsx'
+import useStore from './stores/useStore.jsx'
 
 import './App.css'
 
 function App() {
-    const debug = useControls({
-    debug: false,
-    })
+
+    const debug = useStore((state) => {return state.debug})
 
     const [dimensions, setDimensions] = useState({
       width: window.innerWidth,
@@ -37,7 +37,7 @@ function App() {
 
   return <div style={ dimensions }>
   <KeyboardControls 
-    map={ [
+    map={[
       {name: 'forward', keys: ['ArrowUp', 'KeyW']},
       {name: 'backward', keys: ['ArrowDown', 'KeyS']},
       {name: 'leftward', keys: ['ArrowLeft', 'KeyA']},
@@ -46,11 +46,12 @@ function App() {
     ]}
     >
     <Canvas dpr={[1, 2]}>
-      <Physics debug={debug.debug}>
+      <Physics debug={debug}>
         <Screen />
         <World />
         <Player />
       </Physics>
+      <Controls />
       <Stats />
     </Canvas>
     <Interface />

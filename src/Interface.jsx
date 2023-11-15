@@ -16,10 +16,10 @@ useEffect(() => {
       }  
     }
   
-    window.addEventListener('click', handleClick);
+    window.addEventListener('click', handleClick)
   
     return () => {
-      window.removeEventListener('click', handleClick);
+      window.removeEventListener('click', handleClick)
     }
   }, [stage === "walking"])
 

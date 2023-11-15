@@ -11,8 +11,6 @@ export default function Content () {
 
     const [targetY, setTargetY] = useState(0)
     const setStage = useStore((state) => {return state.setStage})
-    const level = useStore((state) => {return state.level})
-    const setLevel = useStore((state) => {return state.setLevel})
   
     const fontColor = "black"
 

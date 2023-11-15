@@ -1,9 +1,7 @@
 import { PerspectiveCamera, PointerLockControls, Environment, Cylinder } from '@react-three/drei'
-import { RigidBody, quat } from '@react-three/rapier'
-import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { RigidBody } from '@react-three/rapier'
 import useStore from './stores/useStore'
-import * as THREE from 'three'
+
 
 function Wall ({position, rotation}){
     return(
@@ -20,21 +18,13 @@ function Wall ({position, rotation}){
 }
 
 export default function World () {
+
     const stage = useStore((state) => {return state.stage})
     const level = useStore((state) => {return state.level})
-    const cylinder = useRef()
-
-    useFrame(() => {
-        const rotation = quat(cylinder.current.rotation())
-        const eulerRotation = new THREE.Euler().setFromQuaternion(rotation)
-        let yRotation = eulerRotation.x
-        const newRotation = quat().setFromEuler(new THREE.Euler(yRotation+=0.01, 0, 0))
-        cylinder.current.setNextKinematicRotation(newRotation)
-    })
+    const goalPositions = useStore((state) => {return state.goalPositions})
 
     return (
     <>
-    {stage==="walking"? <PointerLockControls/> : null}
     <Environment 
     background
     files={"Artboard-1.hdr"} />
@@ -43,7 +33,6 @@ export default function World () {
     manual 
     aspect={16 / 9} 
     />
-    <spotLight color={"cyan"} intensity={0.5} position={[0, 120, 0]} />
     <ambientLight intensity={0.5} />
     <RigidBody name="floor" type="fixed" colliders="cuboid" restitution={0.1} friction={0.7} >
         <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -59,23 +48,27 @@ export default function World () {
     <Wall rotation={[0, 0, Math.PI/2]} position={[0, 100, 100]}></Wall>
     <Wall rotation={[0, 0, Math.PI/2]} position={[0, 100, -100]}></Wall>
     <Wall rotation={[Math.PI/2, 0, 0]} position={[0, 200, 0]}></Wall>
+    { stage === "walking" &&
+    (level === "level_0" || level === "level_1") ?
+    <RigidBody type={"fixed"} colliders="cuboid" position={goalPositions[0]}>
+    <Cylinder args={[2, 2, 0.6]}>
+        <meshBasicMaterial color={level === "level_0" ? "red" : "green"} />
+    </Cylinder>
+    </RigidBody> : null}
     {level === "level_1" || level === "level_2" ? 
     <RigidBody type="fixed" colliders="cuboid">
-    <Cylinder args={[2, 2, 0.6]} position={[13.6, 58, -19]}>
-        <meshStandardMaterial color={"red"} />
+    <Cylinder args={[2, 2, 0.6]} position={goalPositions[1]}>
+        <meshBasicMaterial color={level === "level_2" ? "green" : "red"} />
     </Cylinder>
     </RigidBody>
     : null}
+    {level === "level_2" && stage === "walking" ?
     <RigidBody type="fixed" colliders="cuboid">
-    <Cylinder args={[2, 2, 0.6]} position={[0, 137, -15]}>
-        <meshStandardMaterial color={"green"} />
+    <Cylinder args={[2, 2, 0.6]} position={goalPositions[2]}>
+        <meshBasicMaterial color={"red"} />
     </Cylinder>
     </RigidBody>
-    <RigidBody ref={cylinder} type={"kinematicPosition"} colliders="cuboid" position={[13.6,3,-19]}>
-    <Cylinder args={[2, 2, 0.6]}>
-        <meshStandardMaterial color={"red"} />
-    </Cylinder>
-    </RigidBody>
+    : null}
     </>
     )
 }   
