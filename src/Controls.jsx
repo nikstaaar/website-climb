@@ -1,46 +1,63 @@
-import useStore from "./stores/useStore"
-import { useControls } from "leva"
-import { useEffect, useState } from "react"
+import useStore from './stores/useStore'
+import { useControls } from 'leva'
+import { useEffect, useState } from 'react'
 
 export default function Controls() {
-    const setLevel = useStore((state) => {return state.setLevel})
-    const setStage = useStore((state) => {return state.setStage})
-    const setMoveSpeed = useStore((state) => {return state.setMoveSpeed})
-    const setJumpHeight = useStore((state) => {return state.setJumpHeight})
-    const setDebug = useStore((state) => {return state.setDebug})
-    const debug = useStore((state) => {return state.debug})
+	const {
+		setLevel,
+		level,
+		setStage,
+		stage,
+		setMoveSpeed,
+		moveSpeed,
+		setJumpHeight,
+		jumpHeight,
+		setDebug,
+		debug,
+	} = useStore((state) => ({
+		setLevel: state.setLevel,
+		level: state.level,
+		setStage: state.setStage,
+		stage: state.stage,
+		setMoveSpeed: state.setMoveSpeed,
+		moveSpeed: state.moveSpeed,
+		setJumpHeight: state.setJumpHeight,
+		jumpHeight: state.jumpHeight,
+		setDebug: state.setDebug,
+		debug: state.debug,
+	}))
 
-    const [isInitialRender, setIsInitialRender] = useState(true);
+	const [isInitialRender, setIsInitialRender] = useState(true)
 
-    const controls = useControls({
-        level: "level_0",
-        stage: "website",
-        jumpHeight: 0.27,
-        moveSpeed: 0.15,
-        debug: debug,
-     })
+	const controls = useControls({
+		level: level,
+		stage: stage,
+		jumpHeight: jumpHeight,
+		moveSpeed: moveSpeed,
+		debug: debug,
+	})
 
-     useEffect(() => {
-        setLevel(controls.level)
-      },[controls.level]) 
-  
-      useEffect(() => {
-        setStage(controls.stage)
-      }, [controls.stage])
+	useEffect(() => {
+		setLevel(controls.level)
+	}, [controls.level])
 
-      useEffect(() => {
-        setMoveSpeed(controls.moveSpeed)
-      }, [controls.moveSpeed])
+	useEffect(() => {
+		setStage(controls.stage)
+	}, [controls.stage])
 
-      useEffect(() => {
-        setJumpHeight(controls.jumpHeight)
-      }, [controls.jumpHeight])
+	useEffect(() => {
+		setMoveSpeed(controls.moveSpeed)
+	}, [controls.moveSpeed])
 
-      useEffect(() => {
-        if (isInitialRender) {
-          setIsInitialRender(false);
-          return
-        }
-        setDebug()
-      }, [controls.debug])
+	useEffect(() => {
+		setJumpHeight(controls.jumpHeight)
+	}, [controls.jumpHeight])
+
+	useEffect(() => {
+		if (isInitialRender) {
+			setIsInitialRender(false)
+			return
+		}
+		setDebug()
+	}, [controls.debug])
 }
