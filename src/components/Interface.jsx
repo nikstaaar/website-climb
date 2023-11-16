@@ -1,4 +1,4 @@
-import useStore from './stores/useStore'
+import useStore from '../stores/useStore'
 import { useKeyboardControls } from '@react-three/drei'
 import { useState, useEffect } from 'react'
 

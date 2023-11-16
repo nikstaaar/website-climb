@@ -5,7 +5,7 @@ import {
 	Cylinder,
 } from '@react-three/drei'
 import { RigidBody } from '@react-three/rapier'
-import useStore from './stores/useStore'
+import useStore from '../stores/useStore'
 
 function Wall({ position, rotation }) {
 	return (

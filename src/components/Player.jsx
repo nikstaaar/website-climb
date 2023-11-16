@@ -13,7 +13,7 @@ import {
 } from '@react-three/rapier'
 import { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import useStore from './stores/useStore'
+import useStore from '../stores/useStore'
 
 export default function Player() {
 	const {

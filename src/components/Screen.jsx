@@ -6,7 +6,7 @@ import { RenderTexture } from './RenderTexture'
 import seedrandom from 'seedrandom'
 import * as THREE from 'three'
 import Content from './Content'
-import useStore from './stores/useStore'
+import useStore from '../stores/useStore'
 
 export default function Screen() {
 	const { level, setLevel, stage, setStage, setFalling, cycle, addCycle } =

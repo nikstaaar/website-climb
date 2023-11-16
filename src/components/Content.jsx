@@ -1,7 +1,7 @@
 import { PerspectiveCamera, Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useRef, useEffect, useState } from 'react'
-import useStore from './stores/useStore'
+import useStore from '../stores/useStore'
 
 export default function Content() {
 	const camera2 = useRef()

@@ -1,4 +1,4 @@
-import useStore from './stores/useStore'
+import useStore from '../stores/useStore'
 import { useControls } from 'leva'
 import { useEffect, useState } from 'react'
 
