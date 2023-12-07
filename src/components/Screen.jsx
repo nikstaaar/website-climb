@@ -261,6 +261,8 @@ export default function Screen() {
 		if (updateCount < 100) setUpdateCount(updateCount + 1)
 	}
 
+	console.log('render')
+
 	return (
 		<>
 			<RenderTexture targetFBO={targetFBO}>

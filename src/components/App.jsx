@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { KeyboardControls, ScrollControls } from '@react-three/drei'
+import {
+	KeyboardControls,
+	Loader,
+	ScrollControls,
+	Plane,
+} from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 
 import World from './World.jsx'
@@ -34,19 +39,6 @@ function App() {
 		}
 	}, [])
 
-	useEffect(() => {
-		const handleResize = () => {
-			setDimensions({
-				width: window.innerWidth,
-				height: window.innerHeight,
-			})
-		}
-		window.addEventListener('resize', handleResize)
-		return () => {
-			window.removeEventListener('resize', handleResize)
-		}
-	}, [])
-
 	return (
 		<div style={dimensions}>
 			<KeyboardControls
@@ -61,13 +53,20 @@ function App() {
 			>
 				<Canvas dpr={[1, 2]}>
 					<Physics debug={debug}>
-						<ScrollControls pages={7}>
-							<Screen />
-						</ScrollControls>
-						<World />
-						<Player />
+						<Suspense fallback={null}>
+							<Player />
+						</Suspense>
+						<Suspense fallback={null}>
+							<World />
+						</Suspense>
+						<Suspense fallback={null}>
+							<ScrollControls pages={7}>
+								<Screen />
+							</ScrollControls>
+						</Suspense>
 					</Physics>
 				</Canvas>
+				<Loader />
 				<Interface />
 			</KeyboardControls>
 		</div>

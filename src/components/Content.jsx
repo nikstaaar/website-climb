@@ -9,7 +9,6 @@ import {
 	useMatcapTexture,
 	useGLTF,
 	useVideoTexture,
-	Svg,
 } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
