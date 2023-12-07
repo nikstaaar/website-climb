@@ -2,18 +2,18 @@ import { create } from 'zustand'
 
 export default create((set) => {
 	return {
-		bigWavesElevation: 0.2,
-		bigWavesFrequencyX: 2,
-		bigWavesFrequencyY: 6,
-		bigWavesSpeed: 0.85,
+		bigWavesElevation: 0.64,
+		bigWavesFrequencyX: 0.6,
+		bigWavesFrequencyY: 1.9,
+		bigWavesSpeed: 0.21,
 		depthColor: '#ff5f64',
 		surfaceColor: '#63b376',
-		colorOffset: 0.25,
-		colorMultiplier: 5,
-		smallWavesElevation: 0.15,
-		smallWavesFrequency: 2,
-		smallWavesSpeed: 0.2,
-		smallIterations: 4,
+		colorOffset: 0.72,
+		colorMultiplier: 2,
+		smallWavesElevation: 0.48,
+		smallWavesFrequency: 1,
+		smallWavesSpeed: 0.01,
+		smallIterations: 2,
 
 		setBigWavesElevation: (bigWavesElevation) => {
 			set(() => {
