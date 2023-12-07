@@ -1,9 +1,9 @@
-import useStore from '../stores/useStore'
+import gameStore from '../stores/gameStore'
 import { useKeyboardControls } from '@react-three/drei'
 import { useState, useEffect } from 'react'
 
 export default function Interface() {
-	const stage = useStore((state) => {
+	const stage = gameStore((state) => {
 		return state.stage
 	})
 	const controls = useKeyboardControls((state) => state)

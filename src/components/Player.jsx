@@ -13,7 +13,8 @@ import {
 } from '@react-three/rapier'
 import { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import useStore from '../stores/useStore'
+import gameStore from '../stores/gameStore'
+import shaderStore from '../stores/shaderStore'
 
 export default function Player() {
 	const {
@@ -26,7 +27,7 @@ export default function Player() {
 		goalPositions,
 		falling,
 		setFalling,
-	} = useStore((state) => ({
+	} = gameStore((state) => ({
 		level: state.level,
 		setLevel: state.setLevel,
 		stage: state.stage,
@@ -37,6 +38,9 @@ export default function Player() {
 		falling: state.falling,
 		setFalling: state.setFalling,
 	}))
+
+	const setOptions = shaderStore((state) => state.setOptions)
+	const options = shaderStore((state) => state.options)
 
 	const { world } = useRapier()
 	const [subscribeKeys, getKeys] = useKeyboardControls()
@@ -111,7 +115,6 @@ export default function Player() {
 		} else {
 			velocity.y -= (gravity * delta) / 20
 		}
-
 		if (keys.forward) {
 			movement.add(forward)
 		}

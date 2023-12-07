@@ -1,16 +1,16 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react'
-import { useGLTF, useFBO, FaceLandmarkerDefaults } from '@react-three/drei'
+import React, { useEffect, useState, useRef } from 'react'
+import { useGLTF, useFBO } from '@react-three/drei'
 import { RigidBody, vec3, quat } from '@react-three/rapier'
 import { useThree, useFrame } from '@react-three/fiber'
 import { RenderTexture } from './RenderTexture'
 import seedrandom from 'seedrandom'
 import * as THREE from 'three'
 import Content from './Content'
-import useStore from '../stores/useStore'
+import gameStore from '../stores/gameStore'
 
 export default function Screen() {
 	const { level, setLevel, stage, setStage, setFalling, cycle, addCycle } =
-		useStore((state) => ({
+		gameStore((state) => ({
 			level: state.level,
 			setLevel: state.setLevel,
 			stage: state.stage,
@@ -28,7 +28,7 @@ export default function Screen() {
 		size.height * viewport.dpr
 	)
 
-	const screenModel = useGLTF('../../screen22.glb')
+	const screenModel = useGLTF('/public/glb/screen22.glb')
 	const screenMeshes = screenModel.scenes[0].children
 	screenMeshes.sort(compareNames)
 	const facePlanes = screenMeshes.slice(
@@ -86,7 +86,7 @@ export default function Screen() {
 					scale={plane.scale}
 					rotation={plane.rotation}
 				>
-					<meshStandardMaterial side={THREE.BackSide} color={'blue'} />
+					<meshStandardMaterial side={THREE.BackSide} color={'white'} />
 				</mesh>
 			</RigidBody>
 		)

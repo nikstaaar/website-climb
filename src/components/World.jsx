@@ -1,11 +1,6 @@
-import {
-	PerspectiveCamera,
-	PointerLockControls,
-	Environment,
-	Cylinder,
-} from '@react-three/drei'
+import { PerspectiveCamera, Environment, Cylinder } from '@react-three/drei'
 import { RigidBody } from '@react-three/rapier'
-import useStore from '../stores/useStore'
+import gameStore from '../stores/gameStore'
 
 function Wall({ position, rotation }) {
 	return (
@@ -22,17 +17,16 @@ function Wall({ position, rotation }) {
 }
 
 export default function World() {
-	const { stage, level, goalPositions } = useStore((state) => ({
+	const { stage, level, goalPositions } = gameStore((state) => ({
 		stage: state.stage,
 		level: state.level,
 		goalPositions: state.goalPositions,
 	}))
-
 	return (
 		<>
-			<Environment background files={'Artboard-1.hdr'} />
+			<Environment background files={'/public/env/puresky_8k.hdr'} />
 			<PerspectiveCamera makeDefault manual aspect={16 / 9} />
-			<ambientLight intensity={0.5} />
+			<ambientLight intensity={1} />
 			<RigidBody
 				name="floor"
 				type="fixed"
@@ -61,21 +55,21 @@ export default function World() {
 					position={goalPositions[0]}
 				>
 					<Cylinder args={[2, 2, 0.6]}>
-						<meshBasicMaterial color={level === 0 ? 'red' : 'green'} />
+						<meshBasicMaterial color={level === 0 ? '#ff5f64' : '#63b376'} />
 					</Cylinder>
 				</RigidBody>
 			) : null}
 			{level === 1 || level === 2 ? (
 				<RigidBody type="fixed" colliders="cuboid">
 					<Cylinder args={[2, 2, 0.6]} position={goalPositions[1]}>
-						<meshBasicMaterial color={level === 2 ? 'green' : 'red'} />
+						<meshBasicMaterial color={level === 2 ? '#63b376' : '#ff5f64'} />
 					</Cylinder>
 				</RigidBody>
 			) : null}
 			{level === 2 && stage === 'walking' ? (
 				<RigidBody type="fixed" colliders="cuboid">
 					<Cylinder args={[2, 2, 0.6]} position={goalPositions[2]}>
-						<meshBasicMaterial color={'red'} />
+						<meshBasicMaterial color={'#ff5f64'} />
 					</Cylinder>
 				</RigidBody>
 			) : null}
