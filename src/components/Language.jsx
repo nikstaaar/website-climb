@@ -130,7 +130,6 @@ export default function Language({ matcap }) {
 					fr
 				</Text>
 			) : null}
-
 			<Text
 				fontSize={0.05}
 				color={fontColor}

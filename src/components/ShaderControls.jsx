@@ -97,49 +97,16 @@ export default function ShaderControls() {
 
 	useEffect(() => {
 		setBigWavesFrequencyX(controls.bigWavesFrequencyX)
-	}, [controls.bigWavesFrequencyX])
-
-	useEffect(() => {
 		setBigWavesFrequencyY(controls.bigWavesFrequencyY)
-	}, [controls.bigWavesFrequencyY])
-
-	useEffect(() => {
 		setBigWavesElevation(controls.bigWavesElevation)
-	}, [controls.bigWavesElevation])
-
-	useEffect(() => {
 		setBigWavesSpeed(controls.bigWavesSpeed)
-	}, [controls.bigWavesSpeed])
-
-	useEffect(() => {
 		setDepthColor(controls.depthColor)
-	}, [controls.depthColor])
-
-	useEffect(() => {
 		setSurfaceColor(controls.surfaceColor)
-	}, [controls.surfaceColor])
-
-	useEffect(() => {
 		setColorOffset(controls.colorOffset)
-	}, [controls.colorOffset])
-
-	useEffect(() => {
 		setColorMultiplier(controls.colorMultiplier)
-	}, [controls.colorMultiplier])
-
-	useEffect(() => {
 		setSmallWavesElevation(controls.smallWavesElevation)
-	}, [controls.smallWavesElevation])
-
-	useEffect(() => {
 		setSmallWavesFrequency(controls.smallWavesFrequency)
-	}, [controls.smallWavesFrequency])
-
-	useEffect(() => {
 		setSmallWavesSpeed(controls.smallWavesSpeed)
-	}, [controls.smallWavesSpeed])
-
-	useEffect(() => {
 		setSmallIterations(controls.smallIterations)
-	}, [controls.smallIterations])
+	}, [controls])
 }
