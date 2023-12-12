@@ -41,7 +41,7 @@ export default function Content() {
 
 	useFrame((state) => {
 		material.uTime = state.clock.getElapsedTime()
-		if (stage !== 'waking') {
+		if (stage !== 'walking') {
 			material.uMouse = new THREE.Vector2(-state.mouse.x, state.mouse.y)
 		}
 		if (groupRef.current) {
@@ -247,7 +247,7 @@ export default function Content() {
 
 				<Text
 					font={fontTextURL}
-					position={[0.9, -6.18, 0]}
+					position={[0.9, -6.24, 0]}
 					textAlign={'right'}
 					anchorX={'right'}
 					anchorY={'top'}
@@ -258,7 +258,7 @@ export default function Content() {
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.9, -6.26, 0]}
+					position={[0.9, -6.32, 0]}
 					textAlign={'right'}
 					anchorX={'right'}
 					anchorY={'top'}
@@ -277,7 +277,7 @@ export default function Content() {
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.9, -6.34, 0]}
+					position={[0.9, -6.38, 0]}
 					textAlign={'right'}
 					anchorX={'right'}
 					anchorY={'top'}
@@ -296,7 +296,7 @@ export default function Content() {
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.9, -6.42, 0]}
+					position={[0.9, -6.44, 0]}
 					textAlign={'right'}
 					anchorX={'right'}
 					anchorY={'top'}

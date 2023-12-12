@@ -10,7 +10,10 @@ export default function Monitor() {
 	const button2 = useGLTF('/public/glb/button2.glb', true)
 	const texture = useVideoTexture('/public/images/example.mp4')
 
-	const { setStage } = gameStore((state) => ({ setStage: state.setStage }))
+	const { setStage, stage } = gameStore((state) => ({
+		setStage: state.setStage,
+		stage: state.stage,
+	}))
 
 	const ref = useRef()
 
@@ -31,7 +34,9 @@ export default function Monitor() {
 				object={button2.scene}
 				onPointerUp={() => {
 					ref.current.position.z = 0.46
-					setStage('falling')
+					if (stage === 'website') {
+						setStage('falling')
+					}
 				}}
 				onPointerDown={() => {
 					ref.current.position.z = 0.45

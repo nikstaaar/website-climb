@@ -1,11 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import {
-	KeyboardControls,
-	Loader,
-	ScrollControls,
-	Plane,
-} from '@react-three/drei'
+import { KeyboardControls, Loader, ScrollControls } from '@react-three/drei'
 import { Physics } from '@react-three/rapier'
 
 import World from './World.jsx'
@@ -17,14 +12,16 @@ import gameStore from '../stores/gameStore.jsx'
 import '/styles/App.css'
 
 function App() {
-	const debug = gameStore((state) => {
-		return state.debug
-	})
+	const { stage, debug } = gameStore((state) => ({
+		stage: state.stage,
+		debug: state.debug,
+	}))
 
 	const [dimensions, setDimensions] = useState({
 		width: window.innerWidth,
 		height: window.innerHeight,
 	})
+	const [scrollEnabled, setScrollEnabled] = useState(true)
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -39,8 +36,25 @@ function App() {
 		}
 	}, [])
 
+	const handleKeyDown = (event) => {
+		if (event.code === 'Space' && stage === 'walking') {
+			setScrollEnabled(false)
+		}
+	}
+
+	const handleKeyUp = (event) => {
+		if (event.code === 'Space') {
+			setScrollEnabled(true)
+		}
+	}
+
 	return (
-		<div style={dimensions}>
+		<div
+			style={dimensions}
+			onKeyDown={handleKeyDown}
+			onKeyUp={handleKeyUp}
+			tabIndex={0}
+		>
 			<KeyboardControls
 				map={[
 					{ name: 'forward', keys: ['ArrowUp', 'KeyW'] },
@@ -60,7 +74,7 @@ function App() {
 							<World />
 						</Suspense>
 						<Suspense fallback={null}>
-							<ScrollControls pages={7}>
+							<ScrollControls pages={7} enabled={scrollEnabled}>
 								<Screen />
 							</ScrollControls>
 						</Suspense>
