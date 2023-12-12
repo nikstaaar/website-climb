@@ -13,8 +13,8 @@ import {
 } from '@react-three/rapier'
 import { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
+
 import gameStore from '../stores/gameStore'
-import shaderStore from '../stores/shaderStore'
 
 export default function Player() {
 	const {
@@ -39,19 +39,16 @@ export default function Player() {
 		setFalling: state.setFalling,
 	}))
 
-	const setOptions = shaderStore((state) => state.setOptions)
-	const options = shaderStore((state) => state.options)
-
 	const { world } = useRapier()
 	const [subscribeKeys, getKeys] = useKeyboardControls()
 
 	const [startReset, setStartReset] = useState(false)
 	const [isResetting, setIsResetting] = useState(false)
 
-	const body = useRef(null)
-	const controller = useRef(null)
-	const collider = useRef(null)
-	const pointerControls = useRef(null)
+	const bodyRef = useRef(null)
+	const controllerRef = useRef(null)
+	const colliderRef = useRef(null)
+	const controlsRef = useRef(null)
 	const refState = useRef({
 		grounded: false,
 		jumping: false,
@@ -59,16 +56,16 @@ export default function Player() {
 	})
 
 	useEffect(() => {
-		if (falling && body.current) {
-			body.current.setBodyType(0)
-			body.current.setEnabled(false)
-			body.current.setEnabled(true)
+		if (falling && bodyRef.current) {
+			bodyRef.current.setBodyType(0)
+			bodyRef.current.setEnabled(false)
+			bodyRef.current.setEnabled(true)
 		}
 	}, [falling])
 
 	useEffect(() => {
 		if (stage === 'standUp' || stage === 'walking') {
-			body.current.setBodyType(2)
+			bodyRef.current.setBodyType(2)
 		}
 	}, [stage])
 
@@ -86,12 +83,12 @@ export default function Player() {
 		characterController.setCharacterMass(0.2)
 		characterController.enableSnapToGround(0.02)
 		characterController.enableAutostep(0.02)
-		controller.current = characterController
+		controllerRef.current = characterController
 	}, [world])
 
 	useFrame((state, delta) => {
-		const position = vec3(body.current.translation())
-		const rotation = quat(body.current.rotation())
+		const position = vec3(bodyRef.current.translation())
+		const rotation = quat(bodyRef.current.rotation())
 		const { velocity } = refState.current
 		const movement = vec3()
 
@@ -145,7 +142,7 @@ export default function Player() {
 
 		switch (stage) {
 			case 'falling':
-				if (body.current.isSleeping()) {
+				if (bodyRef.current.isSleeping()) {
 					setStage('standUp')
 				}
 				break
@@ -167,7 +164,7 @@ export default function Player() {
 				setLevel(level + 1)
 				break
 			case 2:
-				pointerControls.current.unlock()
+				controlsRef.current.unlock()
 				setStage('reset')
 				break
 		}
@@ -177,12 +174,12 @@ export default function Player() {
 		movement.normalize()
 		movement.multiplyScalar(moveSpeed)
 		movement.add(velocity)
-		controller.current.computeColliderMovement(collider.current, movement)
-		refState.current.grounded = controller.current.computedGrounded()
-		let correctedMovement = controller.current.computedMovement()
+		controllerRef.current.computeColliderMovement(colliderRef.current, movement)
+		refState.current.grounded = controllerRef.current.computedGrounded()
+		let correctedMovement = controllerRef.current.computedMovement()
 		position.add(vec3(correctedMovement))
-		body.current.setNextKinematicTranslation(position)
-		const t = body.current.translation()
+		bodyRef.current.setNextKinematicTranslation(position)
+		const t = bodyRef.current.translation()
 		const gP = goalPositions[level]
 		if (
 			t.x < gP[0] + 1.5 &&
@@ -202,7 +199,7 @@ export default function Player() {
 
 	function standUp(rotation) {
 		setFalling(false)
-		body.current.wakeUp(true)
+		bodyRef.current.wakeUp(true)
 		const targetRotation = new THREE.Quaternion(0, 0, 0, 1)
 		const angleDifference = rotation.angleTo(targetRotation)
 		if (angleDifference > 0.05) {
@@ -211,7 +208,7 @@ export default function Player() {
 			time += 0.004
 			const step = easeOutExpo(time)
 			newRotation.slerp(targetRotation, step)
-			body.current.setNextKinematicRotation(newRotation)
+			bodyRef.current.setNextKinematicRotation(newRotation)
 		} else {
 			setStage('walking')
 		}
@@ -233,11 +230,11 @@ export default function Player() {
 			newPosition.lerp(targetPosition, step)
 			setStartReset(true)
 			if (isResetting) {
-				body.current.setNextKinematicRotation(newRotation)
-				body.current.setNextKinematicTranslation(newPosition)
+				bodyRef.current.setNextKinematicRotation(newRotation)
+				bodyRef.current.setNextKinematicTranslation(newPosition)
 			}
 		} else {
-			body.current.setBodyType(1)
+			bodyRef.current.setBodyType(1)
 			setLevel(3)
 		}
 	}
@@ -247,7 +244,7 @@ export default function Player() {
 			<RigidBody
 				type={'fixed'}
 				colliders={false}
-				ref={body}
+				ref={bodyRef}
 				rotation={[-Math.PI / 2, 0, 0]}
 				position={[0, 130.3, -0.4]}
 			>
@@ -258,12 +255,10 @@ export default function Player() {
 					mass={30}
 					restitution={0.2}
 					args={[0.5, 1.5, 0.5]}
-					ref={collider}
+					ref={colliderRef}
 				/>
 			</RigidBody>
-			{stage === 'walking' ? (
-				<PointerLockControls ref={pointerControls} />
-			) : null}
+			{stage === 'walking' ? <PointerLockControls ref={controlsRef} /> : null}
 		</>
 	)
 }

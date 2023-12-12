@@ -7,6 +7,7 @@ import seedrandom from 'seedrandom'
 import * as THREE from 'three'
 import Content from './Content'
 import gameStore from '../stores/gameStore'
+import { compareNames } from '../utils/compareNames'
 
 export default function Screen() {
 	const { level, setLevel, stage, setStage, setFalling, cycle, addCycle } =
@@ -91,18 +92,6 @@ export default function Screen() {
 			</RigidBody>
 		)
 	})
-
-	function compareNames(a, b) {
-		const nameA = a.name.toUpperCase()
-		const nameB = b.name.toUpperCase()
-		if (nameA < nameB) {
-			return -1
-		}
-		if (nameA > nameB) {
-			return 1
-		}
-		return 0
-	}
 
 	useEffect(() => {
 		if (stage === 'falling') {
@@ -260,8 +249,6 @@ export default function Screen() {
 		ref.current.setNextKinematicRotation(rotation)
 		if (updateCount < 100) setUpdateCount(updateCount + 1)
 	}
-
-	console.log('render')
 
 	return (
 		<>

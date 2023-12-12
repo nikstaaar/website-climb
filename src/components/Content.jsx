@@ -4,58 +4,29 @@ import {
 	Plane,
 	Text,
 	Text3D,
-	shaderMaterial,
 	useScroll,
 	useMatcapTexture,
-	useGLTF,
-	useVideoTexture,
 } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import * as THREE from 'three'
+import { useTranslation } from 'react-i18next'
 
 import gameStore from '../stores/gameStore'
-import shaderStore from '../stores/shaderStore'
-import vertexShader from '../shaders/vertex.glsl?raw'
-import fragmentShader from '../shaders/fragment.glsl?raw'
+import Language from './Language'
+import Mouse from './Mouse'
+import Keyboard from './Keyboard'
+import Monitor from './Monitor'
+import { handlePointerOver, handlePointerOut } from '../utils/mouseOver'
+import useCustomShaderMaterial from '../utils/shaderMaterial'
 
 export default function Content() {
-	const { stage, setStage } = gameStore((state) => ({
+	const { stage, language } = gameStore((state) => ({
 		stage: state.stage,
-		setStage: state.setStage,
-	}))
-
-	const {
-		bigWavesElevation,
-		bigWavesFrequencyX,
-		bigWavesFrequencyY,
-		bigWavesSpeed,
-		depthColor,
-		surfaceColor,
-		colorOffset,
-		colorMultiplier,
-		smallWavesElevation,
-		smallWavesFrequency,
-		smallWavesSpeed,
-		smallIterations,
-	} = shaderStore((state) => ({
-		bigWavesElevation: state.bigWavesElevation,
-		bigWavesFrequencyX: state.bigWavesFrequencyX,
-		bigWavesFrequencyY: state.bigWavesFrequencyY,
-		bigWavesSpeed: state.bigWavesSpeed,
-		depthColor: state.depthColor,
-		surfaceColor: state.surfaceColor,
-		colorOffset: state.colorOffset,
-		colorMultiplier: state.colorMultiplier,
-		smallWavesElevation: state.smallWavesElevation,
-		smallWavesFrequency: state.smallWavesFrequency,
-		smallWavesSpeed: state.smallWavesSpeed,
-		smallIterations: state.smallIterations,
+		language: state.language,
 	}))
 
 	const groupRef = useRef()
-	const mouseRef = useRef()
-	const buttonRef = useRef()
 
 	const fontColor = '#353935'
 	const fontHeadURL = '/public/fonts/Oswald-SemiBold.ttf'
@@ -63,128 +34,29 @@ export default function Content() {
 	const font3dURL = '/public/fonts/Oswald_Regular.json'
 	const mdiFontUrl = '/public/fonts/materialdesignicons-webfont.ttf'
 
-	const CustomShaderMaterial = shaderMaterial(
-		{
-			uMouse: new THREE.Vector2(0, 0),
-			uMouseFactor: 0.5,
-			uTime: 0,
-			uBigWavesElevation: bigWavesElevation,
-			uBigWavesFrequency: new THREE.Vector2(
-				bigWavesFrequencyX,
-				bigWavesFrequencyY
-			),
-			uBigWavesSpeed: bigWavesSpeed,
-			uDepthColor: new THREE.Color(depthColor),
-			uSurfaceColor: new THREE.Color(surfaceColor),
-			uColorOffset: colorOffset,
-			uColorMultiplier: colorMultiplier,
-			uSmallWavesElevation: smallWavesElevation,
-			uSmallWavesFrequency: smallWavesFrequency,
-			uSmallWavesSpeed: smallWavesSpeed,
-			uSmallIterations: smallIterations,
-		},
-		vertexShader,
-		fragmentShader
-	)
-
-	const material = new CustomShaderMaterial()
 	const [matcapTexture] = useMatcapTexture('7A7A7A_D9D9D9_BCBCBC_B4B4B4')
-	const keyboard = useGLTF('/public/glb/keyboard.glb', true)
-	const wKey = useGLTF('/public/glb/wKey.glb', true)
-	const aKey = useGLTF('/public/glb/aKey.glb', true)
-	const sKey = useGLTF('/public/glb/sKey.glb', true)
-	const dKey = useGLTF('/public/glb/dKey.glb', true)
-	const spacebar = useGLTF('/public/glb/spacebar.glb', true)
-	const mouse = useGLTF('/public/glb/mouseplc.glb', true)
-	const monitor = useGLTF('/public/glb/monitor.glb', true)
-	const button1 = useGLTF('/public/glb/button1a.glb', true)
-	const button2 = useGLTF('/public/glb/button2.glb', true)
-
+	const material = useCustomShaderMaterial()
 	const scroll = useScroll()
-	const texture = useVideoTexture('/public/images/example.mp4')
+	const { t } = useTranslation()
 
-	function Mouse() {
-		return (
-			<group ref={mouseRef}>
-				{mouse.scene.children.map((child, index) => (
-					<mesh
-						position={[0, -4, 0.1]}
-						rotation={[1.5, -1, 0]}
-						scale={0.2}
-						key={index}
-						geometry={child.geometry}
-					>
-						<meshMatcapMaterial color="#e1e1e1" matcap={matcapTexture} />
-					</mesh>
-				))}
-			</group>
-		)
-	}
-
-	function Key({ object, target, offsetMin, offsetMax }) {
-		const ref = useRef()
-		const position = new THREE.Vector3(0.04, -2, 0)
-		const rotation = new THREE.Euler(-0.9, 0, 0)
-		let newPosition = new THREE.Vector3()
-		let newRotation = new THREE.Euler()
-
-		useFrame(() => {
-			if (scroll.offset > offsetMin && scroll.offset < offsetMax) {
-				const currentPosition = ref.current.position.clone()
-				newPosition = currentPosition.lerp(target, 0.03)
-				newRotation.set(0, 0, 0)
-			} else {
-				const currentPosition = ref.current.position.clone()
-				newPosition = currentPosition.lerp(position, 0.03)
-				newRotation.set(-0.9, 0, 0)
-			}
-
-			ref.current.position.copy(newPosition)
-			ref.current.rotation.copy(newRotation)
-		})
-		return (
-			<primitive
-				ref={ref}
-				position={position}
-				rotation={rotation}
-				scale={0.4}
-				object={object.scenes[0]}
-			></primitive>
-		)
-	}
-
-	const handlePointerOver = () => {
-		document.body.style.cursor = 'pointer'
-	}
-
-	const handlePointerOut = () => {
-		document.body.style.cursor = 'default'
-	}
-
-	useFrame((state, delta) => {
-		let newPosition = new THREE.Vector3()
+	useFrame((state) => {
 		material.uTime = state.clock.getElapsedTime()
-		if (stage === 'website') {
+		if (stage !== 'waking') {
 			material.uMouse = new THREE.Vector2(-state.mouse.x, state.mouse.y)
-			if (scroll.offset > 0.5 && scroll.offset < 0.65) {
-				const currentPosition = mouseRef.current.position.clone()
-				const mousePosition = new THREE.Vector3(
-					-state.mouse.x,
-					state.mouse.y,
-					0
-				)
-				newPosition = currentPosition.lerp(mousePosition, 0.1)
-			} else {
-				const currentPosition = mouseRef.current.position.clone()
-				newPosition = currentPosition.lerp(new THREE.Vector3(0, 0.3, 0), 0.1)
-			}
-			mouseRef.current.position.copy(newPosition)
 		}
 		if (groupRef.current) {
 			const targetY = scroll.offset * 6
 			groupRef.current.position.y = targetY
 		}
 	})
+
+	const getPosition = () => {
+		if (language === 'en' || language === 'fr') {
+			return [-0.545, 0.03, 0]
+		} else {
+			return [-0.502, 0.03, 0]
+		}
+	}
 
 	return (
 		<>
@@ -197,8 +69,11 @@ export default function Content() {
 			/>
 			<ambientLight intensity={0.2}></ambientLight>
 			<spotLight intensity={0.3} position={[1, 1, 1]} />
-
 			<group ref={groupRef} scale={[-1, 1, 1]}>
+				<Language matcap={matcapTexture} />
+				<Keyboard />
+				<Mouse matcap={matcapTexture} />
+				<Monitor />
 				<Float floatIntensity={0.2}>
 					<Text3D
 						position={[0.12, -0.09, 0]}
@@ -217,133 +92,31 @@ export default function Content() {
 						{`<>`}
 					</Text3D>
 				</Float>
-				<primitive
-					position={[0.04, -2, 0]}
-					rotation={[-0.9, 0, 0]}
-					scale={0.4}
-					object={keyboard.scene}
-				/>
-				<Key
-					object={wKey}
-					target={new THREE.Vector3(-0.04, -1.62, 0)}
-					offsetMin={0.1}
-					offsetMax={0.3}
-				/>
-				<Key
-					object={aKey}
-					target={new THREE.Vector3(0.355, -1.522, 0)}
-					offsetMin={0.1}
-					offsetMax={0.3}
-				/>
-				<Key
-					object={sKey}
-					target={new THREE.Vector3(0.6, -1.522, 0)}
-					offsetMin={0.1}
-					offsetMax={0.3}
-				/>
-				<Key
-					object={dKey}
-					target={new THREE.Vector3(0.84, -1.522, 0)}
-					offsetMin={0.1}
-					offsetMax={0.3}
-				/>
-				<Key
-					object={spacebar}
-					target={new THREE.Vector3(0.04, -2.15, 0.3)}
-					offsetMin={0.32}
-					offsetMax={0.6}
-				/>
-				<Mouse />
-				<primitive position={[0, -5.9, 0]} scale={1.2} object={monitor.scene} />
-				<primitive
-					position={[0.125, -5.83, 0.46]}
-					rotation={[0, -1.6, -1.5]}
-					scale={0.03}
-					object={button1.scene}
-				/>
-				<primitive
-					ref={buttonRef}
-					position={[0.125, -5.83, 0.46]}
-					rotation={[0, -1.6, -1.5]}
-					scale={0.03}
-					object={button2.scene}
-					onPointerUp={() => {
-						buttonRef.current.position.z = 0.46
-						setStage('falling')
-					}}
-					onPointerDown={() => {
-						buttonRef.current.position.z = 0.45
-					}}
-					onPointerOver={handlePointerOver}
-					onPointerOut={handlePointerOut}
-				/>
-				<Plane
-					rotation={[-0.07, 0, 0]}
-					position={[0, -5.5, 0.44]}
-					args={[0.55, 0.47]}
-				>
-					<meshBasicMaterial map={texture} toneMapped={false} />
-				</Plane>
 				<Text
-					position={[-0.5, -1.35, 0]}
-					fontSize={0.08}
-					font={fontTextURL}
+					font={fontHeadURL}
+					position={[-0.848, 0.25, 0]}
+					textAlign={'left'}
+					fontSize={0.2}
+					maxWidth={0.5}
 					color={fontColor}
+					lineHeight={0.8}
+					anchorX="left"
 				>
-					forward
-				</Text>
-				<Text
-					position={[-0.17, -1.35, 0]}
-					fontSize={0.08}
-					font={fontTextURL}
-					color={fontColor}
-				>
-					left
-				</Text>
-				<Text
-					position={[0.18, -1.35, 0]}
-					fontSize={0.08}
-					font={fontTextURL}
-					color={fontColor}
-				>
-					backward
-				</Text>
-				<Text
-					position={[0.54, -1.35, 0]}
-					fontSize={0.08}
-					font={fontTextURL}
-					color={fontColor}
-				>
-					right
-				</Text>
-				<Text
-					position={[-0.02, -2.5, 0.3]}
-					fontSize={0.08}
-					font={fontTextURL}
-					color={fontColor}
-				>
-					jump
-				</Text>
-				<Text
-					position={[0, -3, 0.3]}
-					fontSize={0.07}
-					font={fontTextURL}
-					color={fontColor}
-				>
-					you can use the mouse to look around
+					WEBSITE CLIMB
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[-0.735, 0.03, 0]}
+					position={[-0.832, 0.03, 0]}
 					textAlign={'left'}
 					fontSize={0.05}
 					color={fontColor}
+					anchorX="left"
 				>
-					A game by
+					{t('description.part1')}
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[-0.545, 0.03, 0]}
+					position={getPosition()}
 					textAlign={'left'}
 					fontSize={0.05}
 					color={fontColor}
@@ -355,33 +128,17 @@ export default function Content() {
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.02, -0.4, 0]}
+					position={[-0.832, -0.2, 0]}
 					textAlign={'left'}
 					fontSize={0.05}
-					maxWidth={1.7}
+					maxWidth={1.6}
 					color={fontColor}
+					anchorY={'top'}
+					anchorX={'left'}
 				>
-					Hi, I made this simple 3d platformer game with three.js and react.
-					This is my first game ever and first real three.js project, so it's
-					not perfect, but I hope you enjoy it. The controls are quake style and
-					first person. You can read more about the controls in the next
-					section. At the end of the page the game starts. Have Fun!
+					{t('description.part2')}
 				</Text>
-				<mesh rotation={[Math.PI / 10, 0, 0]} position={[0, -3, -2]}>
-					<planeGeometry args={[8, 16, 256, 256]} />
-					<primitive object={material} attach="material" />
-				</mesh>
-				<Text
-					font={fontHeadURL}
-					position={[-0.505, 0.25, 0]}
-					textAlign={'left'}
-					fontSize={0.2}
-					maxWidth={0.5}
-					color={fontColor}
-					lineHeight={0.8}
-				>
-					WEBSITE CLIMB
-				</Text>
+
 				<Text
 					font={fontHeadURL}
 					position={[0.0, -0.95, 0]}
@@ -391,7 +148,57 @@ export default function Content() {
 					color={fontColor}
 					lineHeight={0.8}
 				>
-					CONTROLS
+					{t('controls.part1')}
+				</Text>
+				<Text
+					position={[-0.5, -1.35, 0]}
+					fontSize={0.08}
+					font={fontTextURL}
+					color={fontColor}
+				>
+					{t('controls.part2')}
+				</Text>
+				<Text
+					position={[-0.17, -1.35, 0]}
+					fontSize={0.08}
+					font={fontTextURL}
+					color={fontColor}
+				>
+					{t('controls.part3')}
+				</Text>
+				<Text
+					position={[0.18, -1.35, 0]}
+					fontSize={0.08}
+					font={fontTextURL}
+					color={fontColor}
+				>
+					{t('controls.part4')}
+				</Text>
+				<Text
+					position={[0.54, -1.35, 0]}
+					fontSize={0.08}
+					font={fontTextURL}
+					color={fontColor}
+				>
+					{t('controls.part5')}
+				</Text>
+				<Text
+					position={[-0.02, -2.5, 0.3]}
+					fontSize={0.08}
+					font={fontTextURL}
+					color={fontColor}
+				>
+					{t('controls.part6')}
+				</Text>
+				<Text
+					position={[0, -3, 0.3]}
+					textAlign={'center'}
+					fontSize={0.07}
+					font={fontTextURL}
+					color={fontColor}
+					maxWidth={1}
+				>
+					{t('controls.part7')}
 				</Text>
 				<Text
 					font={fontHeadURL}
@@ -402,7 +209,7 @@ export default function Content() {
 					color={fontColor}
 					lineHeight={0.8}
 				>
-					GOAL
+					{t('instructions.part1')}
 				</Text>
 				<Text
 					position={[0, -4.75, 0]}
@@ -412,8 +219,7 @@ export default function Content() {
 					maxWidth={1}
 					textAlign={'center'}
 				>
-					simply jump onto the next red platform you see. you will find it if
-					you look around.
+					{t('instructions.part2')}
 				</Text>
 				<Text
 					font={fontHeadURL}
@@ -424,7 +230,7 @@ export default function Content() {
 					color={fontColor}
 					lineHeight={1}
 				>
-					Press Button To Start
+					{t('instructions.part3')}
 				</Text>
 				<Text
 					rotation={[0, 0, Math.PI]}
@@ -438,22 +244,13 @@ export default function Content() {
 				>
 					󰤲
 				</Text>
+
 				<Text
 					font={fontTextURL}
-					position={[0, -6.5, 0]}
+					position={[0.9, -6.18, 0]}
 					textAlign={'right'}
-					fontSize={0.04}
-					color={fontColor}
-					onClick={() => window.open('/debug/', '_blank')}
-					onPointerOver={handlePointerOver}
-					onPointerOut={handlePointerOut}
-				>
-					Debug Mode
-				</Text>
-				<Text
-					font={fontTextURL}
-					position={[0.735, -6.2, 0]}
-					textAlign={'right'}
+					anchorX={'right'}
+					anchorY={'top'}
 					fontSize={0.04}
 					color={fontColor}
 				>
@@ -461,8 +258,10 @@ export default function Content() {
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.681, -6.5, 0]}
+					position={[0.9, -6.26, 0]}
 					textAlign={'right'}
+					anchorX={'right'}
+					anchorY={'top'}
 					fontSize={0.03}
 					color={fontColor}
 					onClick={() =>
@@ -474,12 +273,14 @@ export default function Content() {
 					onPointerOver={handlePointerOver}
 					onPointerOut={handlePointerOut}
 				>
-					Computer mouse. by kubassa
+					{t('misc.part1')}
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.595, -6.432, 0]}
+					position={[0.9, -6.34, 0]}
 					textAlign={'right'}
+					anchorX={'right'}
+					anchorY={'top'}
 					fontSize={0.03}
 					color={fontColor}
 					onClick={() =>
@@ -491,12 +292,14 @@ export default function Content() {
 					onPointerOver={handlePointerOver}
 					onPointerOut={handlePointerOut}
 				>
-					button-electronic-constructor by Kroko.blend
+					{t('misc.part2')}
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.58, -6.36, 0]}
+					position={[0.9, -6.42, 0]}
 					textAlign={'right'}
+					anchorX={'right'}
+					anchorY={'top'}
 					fontSize={0.03}
 					color={fontColor}
 					onClick={() =>
@@ -508,12 +311,14 @@ export default function Content() {
 					onPointerOver={handlePointerOver}
 					onPointerOut={handlePointerOut}
 				>
-					Viewsonic 15 1546 CRT Monitor by Moomo0802
+					{t('misc.part3')}
 				</Text>
 				<Text
 					font={fontTextURL}
-					position={[0.691, -6.284, 0]}
+					position={[0.9, -6.5, 0]}
 					textAlign={'right'}
+					anchorX={'right'}
+					anchorY={'top'}
 					fontSize={0.03}
 					color={fontColor}
 					onClick={() =>
@@ -525,8 +330,26 @@ export default function Content() {
 					onPointerOver={handlePointerOver}
 					onPointerOut={handlePointerOut}
 				>
-					Keyboard TX-130 by Shelest
+					{t('misc.part4')}
 				</Text>
+				<Text
+					font={fontTextURL}
+					position={[0.1, -6.5, 0]}
+					textAlign={'right'}
+					anchorX={'right'}
+					anchorY={'top'}
+					fontSize={0.04}
+					color={fontColor}
+					onClick={() => window.open('/debug/', '_blank')}
+					onPointerOver={handlePointerOver}
+					onPointerOut={handlePointerOut}
+				>
+					{t('misc.part5')}
+				</Text>
+				<mesh rotation={[Math.PI / 10, 0, 0]} position={[0, -3, -2]}>
+					<planeGeometry args={[8, 16, 256, 256]} />
+					<primitive object={material} attach="material" />
+				</mesh>
 				<Plane
 					args={[6, 1]}
 					position={[0, 1, 0]}

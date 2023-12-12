@@ -1,14 +1,16 @@
 import gameStore from '../stores/gameStore'
 import { useKeyboardControls } from '@react-three/drei'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function Interface() {
 	const stage = gameStore((state) => {
 		return state.stage
 	})
-	const controls = useKeyboardControls((state) => state)
 
+	const controls = useKeyboardControls((state) => state)
 	const [hasClicked, setHasClicked] = useState(false)
+	const { t } = useTranslation()
 
 	useEffect(() => {
 		const handleClick = () => {
@@ -29,7 +31,7 @@ export default function Interface() {
 			{stage === 'walking' ? (
 				<div className="interface">
 					{!hasClicked ? (
-						<div className="instructions">Left Click to Look Around</div>
+						<div className="instructions">{t('controls.part8')}</div>
 					) : null}
 					<div className="controls">
 						<div className="raw">

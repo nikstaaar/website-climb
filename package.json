@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@coconut-xr/koestlich": "^0.3.12",
     "@react-three/drei": "^9.79.4",
     "@react-three/fiber": "^8.13.6",
     "@react-three/rapier": "^1.1.1",
+    "i18next": "^23.7.8",
+    "i18next-browser-languagedetector": "^7.2.0",
     "leva": "^0.9.35",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^13.5.0",
     "seedrandom": "^3.0.5",
     "three": "^0.153.0",
     "zustand": "^4.4.1"
