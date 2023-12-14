@@ -3,7 +3,7 @@ import { create } from 'zustand'
 export default create((set) => {
 	return {
 		goalPositions: [
-			[50, 1, -19],
+			[50, -4, -19],
 			[13.6, 58, -19],
 			[0, 128, 3],
 			[0, 0, 0],

@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useGLTF, useFBO } from '@react-three/drei'
+import { useGLTF, useFBO, MeshTransmissionMaterial } from '@react-three/drei'
 import { RigidBody, vec3, quat } from '@react-three/rapier'
 import { useThree, useFrame } from '@react-three/fiber'
 import { RenderTexture } from './RenderTexture'
 import seedrandom from 'seedrandom'
 import * as THREE from 'three'
+
 import Content from './Content'
 import gameStore from '../stores/gameStore'
 import { compareNames } from '../utils/compareNames'
@@ -64,30 +65,28 @@ export default function Screen() {
 					scale={block.scale}
 					rotation={block.rotation}
 				>
-					<meshStandardMaterial
-						color="blue"
-						emissive="blue"
-						wireframe={true}
-						emissiveIntensity={1.5}
-					></meshStandardMaterial>
-				</mesh>
-				<mesh
-					geometry={plane.geometry}
-					position={plane.position}
-					scale={plane.scale}
-					rotation={plane.rotation}
-				>
-					<meshStandardMaterial map={targetFBO.texture} />
+					<MeshTransmissionMaterial
+						samples={16}
+						resolution={256}
+						transmissionSampler
+						transmission={0.95}
+						reflectivity={2.1}
+						clearcoat={0.1}
+						clearcoatRoughness={0.1}
+					/>
 				</mesh>
 				<mesh
 					geometry={plane.geometry}
 					position-x={plane.position.x}
-					position-y={plane.position.y - 0.01}
+					position-y={plane.position.y + 0.007}
 					position-z={plane.position.z}
 					scale={plane.scale}
 					rotation={plane.rotation}
 				>
-					<meshStandardMaterial side={THREE.BackSide} color={'white'} />
+					<meshStandardMaterial
+						side={THREE.DoubleSide}
+						map={targetFBO.texture}
+					/>
 				</mesh>
 			</RigidBody>
 		)

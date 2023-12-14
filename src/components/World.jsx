@@ -24,7 +24,12 @@ export default function World() {
 	}))
 	return (
 		<>
-			<Environment background files={'/public/env/puresky_8k.hdr'} />
+			<Environment
+				background
+				near={1}
+				far={1}
+				files={'/public/env/puresky_8k.hdr'}
+			/>
 			<PerspectiveCamera makeDefault manual aspect={16 / 9} />
 			<ambientLight intensity={1} />
 			<RigidBody
@@ -34,13 +39,9 @@ export default function World() {
 				restitution={0.1}
 				friction={0.7}
 			>
-				<mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+				<mesh position={[0, -5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
 					<boxGeometry args={[200, 200, 1]}></boxGeometry>
-					<meshStandardMaterial
-						roughness={0.6}
-						metalness={0}
-						color={'#202026'}
-					/>
+					<meshStandardMaterial roughness={0.6} color={'#202026'} />
 				</mesh>
 			</RigidBody>
 			<Wall rotation={[0, Math.PI / 2, 0]} position={[100, 100, 0]}></Wall>
@@ -55,21 +56,27 @@ export default function World() {
 					position={goalPositions[0]}
 				>
 					<Cylinder args={[2, 2, 0.6]}>
-						<meshBasicMaterial color={level === 0 ? '#ff5f64' : '#63b376'} />
+						<meshStandardMaterial
+							roughness={0.4}
+							color={level === 0 ? '#ff5f64' : '#63b376'}
+						/>
 					</Cylinder>
 				</RigidBody>
 			) : null}
 			{level === 1 || level === 2 ? (
 				<RigidBody type="fixed" colliders="cuboid">
 					<Cylinder args={[2, 2, 0.6]} position={goalPositions[1]}>
-						<meshBasicMaterial color={level === 2 ? '#63b376' : '#ff5f64'} />
+						<meshStandardMaterial
+							roughness={1}
+							color={level === 2 ? '#63b376' : '#ff5f64'}
+						/>
 					</Cylinder>
 				</RigidBody>
 			) : null}
 			{level === 2 && stage === 'walking' ? (
 				<RigidBody type="fixed" colliders="cuboid">
 					<Cylinder args={[2, 2, 0.6]} position={goalPositions[2]}>
-						<meshBasicMaterial color={'#ff5f64'} />
+						<meshStandardMaterial roughness={1} color={'#ff5f64'} />
 					</Cylinder>
 				</RigidBody>
 			) : null}
