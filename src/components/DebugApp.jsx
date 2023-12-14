@@ -14,15 +14,18 @@ import gameStore from '../stores/gameStore.jsx'
 import '/styles/App.css'
 
 function DebugApp() {
-	const debug = gameStore((state) => {
-		return state.debug
-	})
+	const { stage, debug } = gameStore((state) => ({
+		stage: state.stage,
+		debug: state.debug,
+	}))
 
 	const [dimensions, setDimensions] = useState({
 		width: window.innerWidth,
 		height: window.innerHeight,
 	})
 
+	const [scrollEnabled, setScrollEnabled] = useState(true)
+
 	useEffect(() => {
 		const handleResize = () => {
 			setDimensions({
@@ -48,9 +51,26 @@ function DebugApp() {
 			window.removeEventListener('resize', handleResize)
 		}
 	}, [])
+
+	const handleKeyDown = (event) => {
+		if (event.code === 'Space' && stage === 'walking') {
+			setScrollEnabled(false)
+		}
+	}
+
+	const handleKeyUp = (event) => {
+		if (event.code === 'Space') {
+			setScrollEnabled(true)
+		}
+	}
 
 	return (
-		<div style={dimensions}>
+		<div
+			style={dimensions}
+			onKeyDown={handleKeyDown}
+			onKeyUp={handleKeyUp}
+			tabIndex={0}
+		>
 			<KeyboardControls
 				map={[
 					{ name: 'forward', keys: ['ArrowUp', 'KeyW'] },
@@ -63,7 +83,7 @@ function DebugApp() {
 			>
 				<Canvas dpr={[1, 2]}>
 					<Physics debug={debug}>
-						<ScrollControls pages={3}>
+						<ScrollControls pages={7} enabled={scrollEnabled}>
 							<Screen />
 						</ScrollControls>
 						<World />

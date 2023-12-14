@@ -14,7 +14,7 @@ export default function Mouse({ matcap }) {
 	}))
 
 	useFrame((state) => {
-		if (ref.current && stage === 'website') {
+		if (ref.current && stage != 'walking') {
 			let newPosition = new THREE.Vector3()
 			if (scroll.offset > 0.5 && scroll.offset < 0.65) {
 				const currentPosition = ref.current.position.clone()

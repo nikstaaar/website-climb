@@ -21,6 +21,7 @@ function App() {
 		width: window.innerWidth,
 		height: window.innerHeight,
 	})
+
 	const [scrollEnabled, setScrollEnabled] = useState(true)
 
 	useEffect(() => {
