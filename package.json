@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@coconut-xr/koestlich": "^0.3.12",
     "@react-three/drei": "^9.79.4",
     "@react-three/fiber": "^8.13.6",
     "@react-three/rapier": "^1.1.1",
