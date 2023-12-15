@@ -1,5 +1,9 @@
 # Website climb
 
+Playe here:
+
+https://657bbc04074ac01c44136538--leafy-speculoos-1d613b.netlify.app
+
 This repository hosts a unique platformer first-person game built using React Three Fiber. The game begins as a website entirely rendered on a texture, utilizing a modified rendertarget from React Three Drei. The background comprises a custom shader on a plane. Upon clicking 'Start' on the website, the site disintegrates into various shards, initiating the game. Players must navigate and climb these floating shards to reach a specific platform.
 
 ## Features
