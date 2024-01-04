@@ -1,4 +1,4 @@
-# Website climb
+# Website Climb
 
 not ready for mobile. might not work correctly on mac.
 play here:
