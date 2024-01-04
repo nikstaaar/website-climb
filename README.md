@@ -1,6 +1,6 @@
 # Website climb
 
-not ready for mobile. might not work on mac.
+not ready for mobile. might not work correctly on mac.
 play here:
 
 https://657bbc04074ac01c44136538--leafy-speculoos-1d613b.netlify.app
